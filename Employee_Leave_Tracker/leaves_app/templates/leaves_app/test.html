@@ -1,0 +1,305 @@
+{% extends "leaves_app/base.html" %}
+{% block title %}Manager Dashboard{% endblock %}
+
+{% block content %}
+
+<style>
+/* ===== TABS — Same Theme as Navbar ===== */
+.nav-tabs {
+    background-color: #1E293B;   /* same as navbar */
+    border-radius: 8px;
+    padding: 6px;
+}
+
+.nav-tabs .nav-link {
+    color: white !important;      /* visible white */
+    opacity: 1 !important;        /* REMOVE faded look */
+    font-weight: 600;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+}
+
+/* Hover effect for inactive */
+.nav-tabs .nav-link:hover {
+    background-color: rgba(255,255,255,0.25);
+    color: white !important;
+}
+
+/* ACTIVE tab */
+.nav-tabs .nav-link.active {
+    background-color: white !important;
+    color: #0d6efd !important;
+    font-weight: 700;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+/* Tab content card */
+.tab-content {
+    background: #ffffff;
+    padding: 20px;
+    border: 1px solid #dee2e6;
+    border-radius: 0 0 8px 8px;
+}
+
+/* Pagination buttons */
+.pagination-btn {
+    border-radius: 18px;
+    font-weight: 500;
+}
+
+</style>
+
+
+<div class="container mt-4">
+    <h3 class="text-center text-primary fw-bold mb-4">Manager Dashboard</h3>
+
+    <!-- KPI Cards (unchanged as per your request) -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-center shadow-sm border-0" style="background: #7ec8c9;">
+                <div class="card-body">
+                    <h5 class="fw-bold">Pending</h5>
+                    <h3>{{ pending_count }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card text-center shadow-sm border-0" style="background: #8cd790;">
+                <div class="card-body">
+                    <h5 class="fw-bold">Approved</h5>
+                    <h3>{{ approved_count }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card text-center shadow-sm border-0" style="background: #f09991;">
+                <div class="card-body">
+                    <h5 class="fw-bold">Rejected</h5>
+                    <h3>{{ rejected_count }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Nav Tabs -->
+    <ul class="nav nav-tabs mb-3">
+        <li class="nav-item">
+            <a class="nav-link {% if active_tab == 'pending' %}active{% endif %}" href="?tab=pending">Pending</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if active_tab == 'profiles' %}active{% endif %}" href="?tab=profiles">Profiles</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if active_tab == 'history' %}active{% endif %}" href="?tab=history">History</a>
+        </li>
+    </ul>
+
+
+    <div class="tab-content">
+
+        <!-- ============== PENDING TAB ============== -->
+        {% if active_tab == 'pending' %}
+        <div>
+            {% if pending_leaves %}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Employee</th>
+                            <th>Type</th>
+                            <th>Start</th>
+                            <th>End</th>
+                            <th>Duration</th>
+                            <th>Reason</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for leave in pending_leaves %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ leave.applicant.username }}</td>
+                            <td>{{ leave.leave_type.name }}</td>
+                            <td>{{ leave.start_date }}</td>
+                            <td>{{ leave.end_date }}</td>
+                            <td>{{ leave.duration_days }}</td>
+                            <td>{{ leave.reason|default:"—" }}</td>
+                            <td>
+                                <a href="{% url 'leaves_app:approve-leave' leave.id %}" class="btn btn-success btn-sm">Approve</a>
+                                <a href="{% url 'leaves_app:reject-leave' leave.id %}" class="btn btn-danger btn-sm">Reject</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info text-center">No pending leaves.</div>
+            {% endif %}
+        </div>
+        {% endif %}
+
+
+        <!-- ============== PROFILES TAB ============== -->
+        {% if active_tab == 'profiles' %}
+        <div>
+            <form method="get" class="d-flex mb-3">
+                <input type="hidden" name="tab" value="profiles">
+                <input type="text" name="name" class="form-control me-2" placeholder="Search name" value="{{ name_query }}">
+                <button class="btn btn-primary">Search</button>
+            </form>
+
+            {% if profile_page %}
+            <table class="table table-striped">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Username</th>
+                        <th>Department</th>
+                        <th>Designation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for profile in profile_page %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ profile.user.username }}</td>
+                        <td>{{ profile.department|default:"—" }}</td>
+                        <td>{{ profile.designation|default:"—" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Pagination -->
+            <div class="d-flex justify-content-center">
+                {% if profile_page.has_previous %}
+                <a class="btn btn-outline-primary btn-sm me-2"
+                   href="?tab=profiles&name={{ name_query }}&profile_page={{ profile_page.previous_page_number }}">Previous</a>
+                {% endif %}
+                <span class="align-self-center">Page {{ profile_page.number }} of {{ profile_page.paginator.num_pages }}</span>
+                {% if profile_page.has_next %}
+                <a class="btn btn-outline-primary btn-sm ms-2"
+                   href="?tab=profiles&name={{ name_query }}&profile_page={{ profile_page.next_page_number }}">Next</a>
+                {% endif %}
+            </div>
+
+            {% endif %}
+        </div>
+        {% endif %}
+
+
+        <!-- ============== HISTORY TAB ============== -->
+        {% if active_tab == 'history' %}
+        <div>
+            <form method="get" class="row g-2 mb-3">
+                <input type="hidden" name="tab" value="history">
+
+                <div class="col-md-3">
+                    <select name="status" class="form-select">
+                        <option value="">All</option>
+                        <option value="APPROVED" {% if status_filter == 'APPROVED' %}selected{% endif %}>Approved</option>
+                        <option value="REJECTED" {% if status_filter == 'REJECTED' %}selected{% endif %}>Rejected</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <input type="text" name="emp_name" class="form-control" placeholder="Search employee" value="{{ emp_name_query }}">
+                </div>
+
+                <div class="col-md-2">
+                    <button class="btn btn-primary w-100">Filter</button>
+                </div>
+            </form>
+
+            {% if history_page %}
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Employee</th>
+                        <th>Type</th>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for leave in history_page %}
+                    <tr>
+                        <td>{{ leave.applicant.username }}</td>
+                        <td>{{ leave.leave_type.name }}</td>
+                        <td>{{ leave.start_date }}</td>
+                        <td>{{ leave.end_date }}</td>
+                        <td>
+                            {% if leave.status == 'APPROVED' %}
+                            <span class="badge bg-success">Approved</span>
+                            {% elif leave.status == 'REJECTED' %}
+                            <span class="badge bg-danger">Rejected</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Pagination -->
+            <div class="d-flex justify-content-center">
+                {% if history_page.has_previous %}
+                <a class="btn btn-outline-secondary btn-sm me-2"
+                   href="?tab=history&status={{ status_filter }}&emp_name={{ emp_name_query }}&history_page={{ history_page.previous_page_number }}">Previous</a>
+                {% endif %}
+                <span>Page {{ history_page.number }} of {{ history_page.paginator.num_pages }}</span>
+                {% if history_page.has_next %}
+                <a class="btn btn-outline-secondary btn-sm ms-2"
+                   href="?tab=history&status={{ status_filter }}&emp_name={{ emp_name_query }}&history_page={{ history_page.next_page_number }}">Next</a>
+                {% endif %}
+            </div>
+            {% endif %}
+
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}
+
+
+ today = date.today()
+
+    # Employees on leave today
+    employees_on_leave_today = Leave.objects.filter(
+        manager=request.user,
+        status="APPROVED",
+        start_date__lte=today,
+        end_date__gte=today
+    ).select_related("applicant", "leave_type")
+
+    context = {
+        ...
+        "employees_on_leave_today": employees_on_leave_today,
+        ...
+    }
+
+
+
+    # for leaves recent 
+
+# Fetch latest 2 leaves for this employee
+recent_leaves = Leave.objects.filter(
+    applicant=request.user
+).order_by('-applied_at')[:2]
+
+
+
+context = {
+    ...
+    "recent_leaves": recent_leaves,
+    ...
+}

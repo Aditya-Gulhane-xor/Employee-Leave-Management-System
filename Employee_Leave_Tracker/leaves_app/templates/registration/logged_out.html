@@ -1,0 +1,40 @@
+{% extends "leaves_app/base.html" %}
+{% block title %}Logged Out{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center vh-100">
+  <div class="bg-white shadow rounded-4 p-5 text-center" style="max-width: 480px; width: 100%;">
+    
+    <!-- Logout Icon -->
+    <div class="mb-3">
+      <i class="bi bi-box-arrow-right text-danger" style="font-size: 3rem;"></i>
+    </div>
+
+    <h3 class="fw-semibold text-dark mb-2">You’ve been logged out</h3>
+    <p class="text-muted mb-4">
+      Your session has ended securely. Thank you for using the Leave Management System.
+    </p>
+
+    <a href="{% url 'login' %}" class="btn btn-primary px-4 py-2 shadow-sm">
+      <i class="bi bi-box-arrow-in-right me-2"></i> Login Again
+    </a>
+  </div>
+</div>
+
+<style>
+  body {
+    background-color: #f0f2f5;
+  }
+
+  .btn-primary {
+    background-color: #06b6d4;
+    border-color: #06b6d4;
+    border-radius: 6px;
+  }
+
+  .btn-primary:hover {
+    background-color: #0891b2;
+    border-color: #0891b2;
+  }
+</style>
+{% endblock %}

@@ -1,0 +1,120 @@
+{% extends "leaves_app/base.html" %}
+{% block title %}My Leave Balance{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="text-center mb-5">
+    <h3 class="fw-semibold text-dark mb-2">My Leave Balance</h3>
+    <p class="text-muted small">Visual summary of your available and used leaves</p>
+  </div>
+
+  {% if leave_data %}
+    <div class="row g-4 justify-content-center">
+      {% for item in leave_data %}
+        {% if item.max > 0 %}
+          {% widthratio item.used item.max 100 as percent %}
+        {% else %}
+          {% with 0 as percent %}
+          {% endwith %}
+        {% endif %}
+
+        <div class="col-md-4 col-sm-6">
+          <div class="card shadow-sm border-0 rounded-4 h-100 p-4 text-center gradient-card">
+            <!-- Icon -->
+            <div class="mb-3">
+              <i class="bi bi-calendar-week-fill fs-1 text-white"></i>
+            </div>
+
+            <!-- Leave Type -->
+            <h5 class="text-white fw-semibold mb-1">{{ item.type }}</h5>
+            <p class="text-white-50 small mb-4">Max Allowed: {{ item.max }}</p>
+
+            <!-- Dynamic Circular Progress -->
+            <div class="progress-circle mx-auto mb-3" style="--value: {{ percent }};">
+              <div class="inner-circle">
+                <span class="fw-bold text-white fs-5">{{ item.remaining }}</span>
+                <small class="text-white-50 d-block" style="font-size: 0.7rem;">Left</small>
+              </div>
+            </div>
+
+            <p class="text-white small mb-0">
+              Used: <strong>{{ item.used }}</strong> | Remaining: <strong>{{ item.remaining }}</strong>
+            </p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info text-center shadow-sm">
+      No leave types defined yet.
+    </div>
+  {% endif %}
+
+  <div class="text-center mt-5">
+    <a href="{% url 'leaves_app:emp-dashboard' %}" class="btn btn-outline-primary btn-lg shadow-sm">
+      <i class="bi bi-arrow-left-circle me-2"></i> Back to Dashboard
+    </a>
+  </div>
+</div>
+
+<!-- 🎨 Custom Styles -->
+<style>
+  body {
+    background-color: #eef2f6;
+  }
+
+  .gradient-card {
+    background: linear-gradient(135deg, #0ea5e9, #06b6d4);
+    color: #fff;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .gradient-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 22px rgba(0,0,0,0.15);
+  }
+
+  /* Circular Progress */
+  .progress-circle {
+    --size: 130px;
+    --thickness: 10px;
+    --value: 60;
+    width: var(--size);
+    height: var(--size);
+    border-radius: 50%;
+    background: conic-gradient(
+      #fff calc(var(--value) * 1%),
+      rgba(255,255,255,0.25) 0
+    );
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  /* Inner black circle */
+  .inner-circle {
+    position: absolute;
+    width: calc(var(--size) - var(--thickness)*2);
+    height: calc(var(--size) - var(--thickness)*2);
+    border-radius: 50%;
+    background-color: #111827; /* deep black inner circle */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .btn-outline-primary {
+    border-color: #06b6d4;
+    color: #06b6d4;
+  }
+
+  .btn-outline-primary:hover {
+    background-color: #06b6d4;
+    color: white;
+  }
+</style>
+{% endblock %}
+

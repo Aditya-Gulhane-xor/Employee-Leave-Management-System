@@ -1,0 +1,151 @@
+{% extends "leaves_app/base.html" %}
+{% block title %}Employee Dashboard{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+
+  <!-- 🔔 Notifications Section -->
+  {% if unread_notifications %}
+    <div class="card shadow-sm border-0 mb-4">
+      <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+        <span class="fw-semibold"><i class="bi bi-bell-fill me-2"></i>Notifications</span>
+        <form action="{% url 'leaves_app:mark-notifications-read' %}" method="post" class="m-0">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-sm btn-light text-primary fw-semibold">
+            Mark all as read
+          </button>
+        </form>
+      </div>
+      <ul class="list-group list-group-flush">
+        {% for note in unread_notifications %}
+          <li class="list-group-item py-3">
+            <div class="d-flex justify-content-between">
+              <div>
+                <span class="fw-semibold text-dark">{{ note.message }}</span><br>
+                <small class="text-muted">{{ note.created_at|date:"M d, Y H:i" }}</small>
+              </div>
+              <i class="bi bi-dot text-info" style="font-size: 1.5rem;"></i>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+ 
+  {% comment %} notification session ends here  {% endcomment %}
+
+
+
+  
+  <!-- 🧭 Main Dashboard -->
+  <div class="text-center mt-5">
+    <h3 class="fw-semibold text-dark mb-4">Employee Dashboard</h3>
+    <p class="text-muted mb-5">Access your key actions and leave information</p>
+    
+       <!-- ================= Recent Leave Activity ================= -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-dark text-white fw-bold">
+        Recent Leave Activity
+    </div>
+
+    {% if recent_leaves %}
+    <ul class="list-group list-group-flush">
+        {% for leave in recent_leaves %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+                <strong>{{ leave.leave_type.name }}</strong><br>
+                <small class="text-muted">
+                    {{ leave.start_date }} → {{ leave.end_date }}
+                </small>
+            </div>
+
+            <span>
+                {% if leave.status == 'APPROVED' %}
+                    <span class="badge bg-success">Approved</span>
+                {% elif leave.status == 'REJECTED' %}
+                    <span class="badge bg-danger">Rejected</span>
+                {% elif leave.status == 'CANCELLED' %}
+                    <span class="badge bg-secondary">Cancelled</span>
+                {% else %}
+                    <span class="badge bg-warning text-dark">Pending</span>
+                {% endif %}
+            </span>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <div class="p-3 text-center text-muted">
+        No recent leave records.
+    </div>
+    {% endif %}
+</div>
+    
+    <!-- Button Grid -->
+    <div class="row g-4 justify-content-center">
+      
+      <!-- Apply for Leave -->
+      <div class="col-md-4 col-sm-6">
+        <div class="card h-100 border-0 shadow-sm text-center p-4 hover-card">
+          <div class="mb-3 text-success">
+            <i class="bi bi-pencil-square" style="font-size: 2rem;"></i>
+          </div>
+          <h5 class="fw-semibold">Apply for Leave</h5>
+          <p class="text-muted small">Submit a new leave request to your manager.</p>
+          <a href="{% url 'leaves_app:apply-leave' %}" class="btn btn-success w-100 mt-2">Apply</a>
+        </div>
+      </div>
+
+      <!-- View Leave History -->
+      <div class="col-md-4 col-sm-6">
+        <div class="card h-100 border-0 shadow-sm text-center p-4 hover-card">
+          <div class="mb-3 text-primary">
+            <i class="bi bi-clock-history" style="font-size: 2rem;"></i>
+          </div>
+          <h5 class="fw-semibold">View Leave History</h5>
+          <p class="text-muted small">Check your past leave applications and approvals.</p>
+          <a href="{% url 'leaves_app:view-history' %}" class="btn btn-primary w-100 mt-2">View</a>
+        </div>
+      </div>
+
+      <!-- View Remaining Leaves -->
+      <div class="col-md-4 col-sm-6">
+        <div class="card h-100 border-0 shadow-sm text-center p-4 hover-card">
+          <div class="mb-3 text-info">
+            <i class="bi bi-calendar-check" style="font-size: 2rem;"></i>
+          </div>
+          <h5 class="fw-semibold">View Remaining Leaves</h5>
+          <p class="text-muted small">Know how many leaves you still have available.</p>
+          <a href="{% url 'leaves_app:leave-balance' %}" class="btn btn-info text-white w-100 mt-2">Check</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🎨 Custom Styling -->
+<style>
+  body {
+    background-color: #f0f2f5;
+  }
+
+  .hover-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 10px;
+  }
+
+  .hover-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+  }
+
+  .btn {
+    border-radius: 6px;
+    font-weight: 500;
+  }
+
+  .card-header {
+    border-top-left-radius: 10px !important;
+    border-top-right-radius: 10px !important;
+  }
+</style>
+{% endblock %}

@@ -1,0 +1,103 @@
+{% extends "leaves_app/base.html" %}
+{% block title %}Apply for Leave{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center min-vh-100" style="padding-top: 70px; padding-bottom: 40px;">
+  <div class="card shadow border-0 rounded-4" style="width: 100%; max-width: 600px;">
+    <div class="card-body p-5">
+      <h3 class="text-center text-dark fw-semibold mb-4">Apply for Leave</h3>
+      <p class="text-center text-muted mb-4">Fill out the form below to submit your leave request</p>
+
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} text-center small mb-4">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <!-- Leave Type -->
+        <div class="mb-4">
+          <label class="form-label fw-medium">Leave Type</label>
+          {{ form.leave_type }}
+          <small class="text-danger">{{ form.leave_type.errors }}</small>
+        </div>
+
+        <!-- Start / End Dates -->
+        <div class="row">
+          <div class="col-md-6 mb-4">
+            <label class="form-label fw-medium">Start Date</label>
+            {{ form.start_date }}
+            <small class="text-danger">{{ form.start_date.errors }}</small>
+          </div>
+          <div class="col-md-6 mb-4">
+            <label class="form-label fw-medium">End Date</label>
+            {{ form.end_date }}
+            <small class="text-danger">{{ form.end_date.errors }}</small>
+          </div>
+        </div>
+
+        <!-- Reason -->
+        <div class="mb-4">
+          <label class="form-label fw-medium">Reason</label>
+          {{ form.reason }}
+          <small class="text-danger">{{ form.reason.errors }}</small>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary w-100 py-2 shadow-sm fw-semibold">
+          <i class="bi bi-send-fill me-2"></i>Submit Application
+        </button>
+      </form>
+
+      <div class="text-center mt-4">
+        <a href="{% url 'leaves_app:emp-dashboard' %}" class="text-decoration-none text-secondary fw-medium">
+          <i class="bi bi-arrow-left-circle me-1"></i> Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🎨 Styling -->
+<style>
+  body {
+    background-color: #f0f3f7;
+  }
+
+  .card {
+    background-color: #ffffff;
+  }
+
+  select, input[type="date"], textarea {
+    border-radius: 6px !important;
+    border: 1px solid #ced4da !important;
+    padding: 10px !important;
+    width: 100%;
+    transition: all 0.2s ease-in-out;
+  }
+
+  select:focus, input[type="date"]:focus, textarea:focus {
+    border-color: #06b6d4 !important;
+    box-shadow: 0 0 0 0.2rem rgba(6, 182, 212, 0.25);
+    outline: none;
+  }
+
+  .btn-primary {
+    background-color: #06b6d4;
+    border-color: #06b6d4;
+    border-radius: 6px;
+  }
+
+  .btn-primary:hover {
+    background-color: #0891b2;
+    border-color: #0891b2;
+  }
+
+  textarea {
+    resize: none;
+  }
+</style>
+{% endblock %}

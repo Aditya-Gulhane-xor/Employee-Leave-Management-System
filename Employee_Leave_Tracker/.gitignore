@@ -1,0 +1,59 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Django stuff
+*.log
+*.pot
+*.pyc
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+static/
+
+# Environment variables
+.env
+*.env
+
+# Virtual environment
+venv/
+VENV/
+env/
+ENV/
+
+# VS Code settings
+.vscode/
+
+# Byte-compiled / cache
+*.egg-info/
+.eggs/
+*.egg
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Migrations (optional - keep if needed)
+# Uncomment to ignore migrations:
+# **/migrations/*.py
+# !**/migrations/__init__.py
+
+# Pip files
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Pytest / Coverage
+htmlcov/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json

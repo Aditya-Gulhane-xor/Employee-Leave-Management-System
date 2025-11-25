@@ -1,0 +1,72 @@
+{% extends "leaves_app/base.html" %}
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center vh-100">
+  <div class="bg-white shadow rounded-4 p-5" style="width: 100%; max-width: 420px;">
+    <div class="text-center mb-4">
+      <h3 class="fw-semibold text-dark mb-1">Sign In</h3>
+      <p class="text-muted small mb-0">Access your account securely</p>
+    </div>
+
+    {% if form.errors %}
+      <div class="alert alert-danger py-2 text-center small">
+        Invalid username or password. Please try again.
+      </div>
+    {% endif %}
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      
+      <div class="mb-3">
+        <label for="id_username" class="form-label fw-medium">Username</label>
+        {{ form.username }}
+      </div>
+
+      <div class="mb-3">
+        <label for="id_password" class="form-label fw-medium">Password</label>
+        {{ form.password }}
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100 py-2 mt-2 shadow-sm">
+        <i class="bi bi-box-arrow-in-right me-2"></i> Login
+      </button>
+    </form>
+
+    <hr class="my-4">
+
+    <p class="text-center text-muted mb-1">
+      Don’t have an account?
+      <a href="{% url 'leaves_app:register' %}" class="fw-semibold text-decoration-none text-primary">Register</a>
+    </p>
+  </div>
+</div>
+
+<!-- Optional Styling for input fields -->
+<style>
+  input[type="text"], input[type="password"] {
+    border-radius: 6px !important;
+    border: 1px solid #cbd5e1 !important;
+    padding: 10px 12px !important;
+    width: 100%;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  }
+
+  input[type="text"]:focus, input[type="password"]:focus {
+    border-color: #06b6d4 !important;
+    box-shadow: 0 0 0 0.2rem rgba(6, 182, 212, 0.2);
+    outline: none;
+  }
+
+  .btn-primary {
+    background-color: #06b6d4;
+    border-color: #06b6d4;
+    border-radius: 6px;
+  }
+
+  .btn-primary:hover {
+    background-color: #0891b2;
+    border-color: #0891b2;
+  }
+</style>
+{% endblock %}

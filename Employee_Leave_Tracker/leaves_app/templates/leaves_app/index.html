@@ -1,0 +1,45 @@
+{% extends "leaves_app/base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center align-items-center vh-100">
+  <div class="text-center bg-white shadow rounded-4 p-5" style="max-width: 550px; width: 100%;">
+    
+    {% if user.is_authenticated %}
+      <h3 class="fw-semibold text-dark mb-3">Welcome back, {{ user.first_name|default:user.username }}</h3>
+      
+      {% if user.profile.is_manager %}
+        <p class="text-muted mb-4">
+          You are logged in as a <span class="fw-semibold text-primary">Manager</span>.
+        </p>
+        <a href="{% url 'leaves_app:manager-dashboard' %}" class="btn btn-primary btn-lg px-4 shadow-sm">
+          <i class="bi bi-speedometer2 me-2"></i> Manager Dashboard
+        </a>
+      {% else %}
+        <p class="text-muted mb-4">
+          You are logged in as an <span class="fw-semibold text-primary">Employee</span>.
+        </p>
+        <a href="{% url 'leaves_app:emp-dashboard' %}" class="btn btn-info btn-lg px-4 shadow-sm text-white">
+          <i class="bi bi-person-workspace me-2"></i> Employee Dashboard
+        </a>
+      {% endif %}
+
+    {% else %}
+      <h3 class="fw-semibold text-dark mb-3">Employee Leave Management System</h3>
+      <p class="text-muted mb-4">
+        Manage leaves, approvals, and records seamlessly through our platform.
+      </p>
+      
+      <div class="d-flex justify-content-center gap-3">
+        <a href="{% url 'login' %}" class="btn btn-primary btn-lg px-4 shadow-sm">
+          <i class="bi bi-box-arrow-in-right me-2"></i> Login
+        </a>
+        <a href="{% url 'leaves_app:register' %}" class="btn btn-outline-dark btn-lg px-4 shadow-sm">
+          <i class="bi bi-person-plus me-2"></i> Register
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+

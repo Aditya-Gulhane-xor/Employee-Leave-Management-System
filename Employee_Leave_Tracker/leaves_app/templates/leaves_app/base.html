@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}Leave Management System{% endblock %}</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f0f2f5;
+        color: #1e293b;
+        min-height: 100vh;
+      }
+
+      /* Navbar Styling */
+      .navbar {
+        background-color: #1E293B !important;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      }
+
+      .navbar-brand {
+        font-weight: 600;
+        letter-spacing: 0.5px;
+      }
+
+      .nav-link {
+        color: #e2e8f0 !important;
+        transition: color 0.2s ease-in-out;
+      }
+
+      .nav-link:hover {
+        color: #06b6d4 !important;
+      }
+
+      /* Notification Bell */
+      .notification-bell {
+        font-size: 1.4rem;
+        color: #e2e8f0;
+        position: relative;
+      }
+
+      .notification-badge {
+        position: absolute;
+        top: -5px;
+        right: -10px;
+        background: #ef4444;
+        color: white;
+        border-radius: 50%;
+        padding: 2px 6px;
+        font-size: 0.7rem;
+        font-weight: 600;
+      }
+
+      /* Buttons */
+      .btn-primary {
+        background-color: #06b6d4;
+        border-color: #06b6d4;
+        border-radius: 6px;
+        transition: all 0.2s ease-in-out;
+      }
+
+      .btn-primary:hover {
+        background-color: #0891b2;
+        border-color: #0891b2;
+        transform: translateY(-1px);
+      }
+
+      .btn-outline-secondary {
+        border-radius: 6px;
+      }
+
+      /* Logout Button Fix */
+      .logout-form button {
+        border-radius: 6px;
+        padding: 5px 12px;
+        font-size: 0.9rem;
+        line-height: 1.4;
+        display: flex;
+        align-items: center;
+      }
+
+      /* Messages */
+      .alert {
+        border-radius: 8px;
+        font-size: 0.95rem;
+      }
+
+      /* Content Fade Animation */
+      .container {
+        animation: fadeIn 0.3s ease-in-out;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      /* Footer */
+      footer {
+        text-align: center;
+        padding: 15px 0;
+        color: #64748b;
+        font-size: 0.85rem;
+      }
+    </style>
+
+    {% block extra_head %}{% endblock %}
+  </head>
+
+  <body>
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+      <div class="container-fluid">
+        <a class="navbar-brand text-light" href="{% url 'leaves_app:index' %}">ELMS</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav" aria-controls="navbarNav"
+                aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item"><a class="nav-link" href="{% url 'leaves_app:index' %}">Home</a></li>
+
+            {% if user.is_authenticated %}
+              {% if user.profile.is_manager %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'leaves_app:manager-dashboard' %}">Manager Dashboard</a>
+                </li>
+              {% else %}
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'leaves_app:emp-dashboard' %}">Employee Dashboard</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="{% url 'leaves_app:apply-leave' %}">Apply Leave</a>
+                </li>
+              {% endif %}
+            {% endif %}
+          </ul>
+
+          <!-- Right Section -->
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+            {% if user.is_authenticated %}
+              
+              {% if not user.profile.is_manager %}
+                <li class="nav-item me-3">
+                  <a class="nav-link position-relative" >
+                    <i class="bi bi-bell-fill notification-bell"></i>
+                    {% if unread_count and unread_count > 0 %}
+                      <span class="notification-badge">{{ unread_count }} </span>
+                    {% endif %}
+                  </a>
+                </li>
+              {% endif %}
+
+              <!-- User Name -->
+              <li class="nav-item d-flex align-items-center text-light me-3">
+                <i class="bi bi-person-circle me-2"></i>
+                <span>{{ user.get_full_name|default:user.username }}</span>
+              </li>
+
+              <!-- Fixed Logout Button Alignment -->
+              <li class="nav-item d-flex align-items-center">
+                <form action="{% url 'logout' %}" method="post" class="logout-form mb-0">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-outline-light btn-sm d-flex align-items-center">
+                    <i class="bi bi-box-arrow-right me-1"></i> Logout
+                  </button>
+                </form>
+              </li>
+
+            {% else %}
+              <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+              <li class="nav-item"><a class="nav-link" href="{% url 'leaves_app:register' %}">Register</a></li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <div class="container mt-4">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} shadow-sm">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+      {% block content %}{% endblock %}
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="mt-auto">
+      © {{ now|date:"Y" }} Employee Leave Management System — All Rights Reserved
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    {% block extra_scripts %}{% endblock %}
+  </body>
+</html>
